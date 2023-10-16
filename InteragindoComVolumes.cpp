@@ -30,25 +30,29 @@ public:
 	void DesmontarVolume(wstring Letra)
 	{
 		if (Identificador == INVALID_HANDLE_VALUE)
-			cout << "A unidade selecionada não foi encontrada.\n";
+		{
+			cout << "A unidade selecionada nÃ£o foi encontrada.\n";
+		}
 		else
 		{
 
-			//Irá obter o identificador do volume associado a letra selecionada, para remontar mais tarde.
+			//IrÃ¡ obter o identificador do volume associado a letra selecionada, para remontar mais tarde.
 			if (GetVolumeNameForVolumeMountPoint(Letra.c_str(), Volume, MAX_PATH) == NULL)
-				cout << "Ocorreu um erro durante a operação.." << GetLastError() << " \n";
+			{
+				cout << "Ocorreu um erro durante a operaÃ§Ã£o.." << GetLastError() << " \n";
+			}
 			else
 			{
 				DWORD BytesRetornados;
 				DeviceIoControl(Identificador, FSCTL_DISMOUNT_VOLUME, 0, 0, 0, 0, &BytesRetornados, 0);
 				DeviceIoControl(Identificador, IOCTL_DISK_UPDATE_PROPERTIES, 0, 0, 0, 0, &BytesRetornados, 0);
 
-				cout << "O voluem será desbloqueado após 15 segundos..\n";
+				cout << "O voluem serÃ¡ desbloqueado apÃ³s 15 segundos..\n";
 
-				//Isto irá manter o volume desmontado e inacessível durante 15 segundos.
+				//Isto irÃ¡ manter o volume desmontado e inacessÃ­vel durante 15 segundos.
 				Sleep(15 * 1000);
 
-				//O volume é liberado ao finalizar o identificador.
+				//O volume Ã© liberado ao finalizar o identificador.
 				CloseHandle(Identificador);
 			}
 		}
@@ -75,7 +79,7 @@ public:
 
 	/*
 	* 
-	* Para que ocorra sucesso, não pode haver a letra selecionada já atribuída a outra unidade.
+	* Para que ocorra sucesso, nÃ£o pode haver a letra selecionada jÃ¡ atribuÃ­da a outra unidade.
 	* 
 	*/
 	void TrocarLetraDeUnidade(wstring Letra, wstring NovaLetra)
@@ -96,27 +100,27 @@ public:
 int main()
 {
 
-	cout << "O assistente está efetuando alterações no volume da unidade...\n\n";
+	cout << "O assistente estÃ¡ efetuando alteraÃ§Ãµes no volume da unidade...\n\n";
 
 	Funcoes.ObterIdentificadorDeUnidade(L"\\\\.\\D:");
 	Funcoes.DesmontarVolume(L"D:\\");
 
-	//Após ter dado 15 segundos de espera da função de desmontagem, a nova letra será atribuída.
-	cout << "Executando operações para a mudança de letra da unidade selecionada.\n";
+	//ApÃ³s ter dado 15 segundos de espera da funÃ§Ã£o de desmontagem, a nova letra serÃ¡ atribuÃ­da.
+	cout << "Executando operaÃ§Ãµes para a mudanÃ§a de letra da unidade selecionada.\n";
 	Funcoes.TrocarLetraDeUnidade(L"D:\\", L"E:\\");
 
 	Sleep(2 * 1000);
 
 	/*
 	* Coloca o volume no estado offline.
-	* Caso seja necessário deixar o volume indisponível por um tempo, colocar o volume offline é mais eficaz que apenas desmontar.
-	* Ao colocar o volume em modo offline, irá impedir que o mesmo seja montado novamente com facilidade.
+	* Caso seja necessÃ¡rio deixar o volume indisponÃ­vel por um tempo, colocar o volume offline Ã© mais eficaz que apenas desmontar.
+	* Ao colocar o volume em modo offline, irÃ¡ impedir que o mesmo seja montado novamente com facilidade.
 	*/
 	Funcoes.AlterarStatusDeVolume(L"\\\\.\\E:", true);
 
 	Funcoes.AlterarStatusDeVolume(L"\\\\.\\E:", false);//Colocando o volume em modo online.
 
-	Sleep(4 * 1000);//Após 4 segundos, a letra da unidade será removida.
+	Sleep(4 * 1000);//ApÃ³s 4 segundos, a letra da unidade serÃ¡ removida.
 	Funcoes.DeletarLetraDeUnidade(L"E:\\");
 
 	system("pause");
